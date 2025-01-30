@@ -1,7 +1,9 @@
 library(readxl)
 
 # obtener ruta del archivo
-ruta_archivo <- list.files("datos/datos_originales", full.names = T) |> str_subset("xls")
+ruta_archivo <- list.files("datos/datos_originales", full.names = T) |> 
+  str_subset("xls") |> 
+  str_subset("~", negate = T)
 
 # cargar archivo excel
 datos <- read_excel(ruta_archivo, sheet = "Tasas a nivel de Comuna")
@@ -66,10 +68,23 @@ celdas <- xlsx_cells(ruta_archivo, sheets = "Tasas a nivel de Comuna") |>
 titulos <- celdas |> 
   filter(str_detect(character, "Tabla")) |> 
   select(row, col) |> 
-  inner_join(cells, by = c("row", "col"))
+  inner_join(celdas, by = c("row", "col"))
 
 # separar hoja por tablas en base al título de cada una
 tablas <- partition(celdas, titulos)
+
+
+# des-pivotar tabla de total
+tabla_total <- tablas$cells[[1]] |> 
+  behead("up", "título") |> 
+  behead("up-left", "año") |> 
+  behead("up-left", "sistema") |> 
+  behead("up", "variable") |> 
+  behead("left", "comuna") |> 
+  select(año, sistema, variable, comuna,
+         cifra = numeric) |> 
+  mutate(sexo = "Total")
+
 
 # des-pivotar tabla de hombres
 tabla_mujeres <- tablas$cells[[2]] |> 
@@ -102,7 +117,7 @@ tabla_hombres |>
   filter(comuna == "ARICA", año == 2023)
 
 # unir datos
-desvinculados <- bind_rows(tabla_mujeres, tabla_hombres)
+desvinculados <- bind_rows(tabla_total, tabla_mujeres, tabla_hombres)
 
 # guardar ----
 readr::write_csv2(desvinculados, "datos/tasa_incidencia_desvinculacion_2010-2023.csv")
