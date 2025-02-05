@@ -1,3 +1,5 @@
+# convertir los datos desde Excel a un formato de tabla tidy
+
 library(readxl)
 
 # obtener ruta del archivo
@@ -120,5 +122,5 @@ tabla_hombres |>
 desvinculados <- bind_rows(tabla_total, tabla_mujeres, tabla_hombres)
 
 # guardar ----
-readr::write_csv2(desvinculados, "datos/tasa_incidencia_desvinculacion_2010-2023.csv")
-writexl::write_xlsx(desvinculados, "datos/tasa_incidencia_desvinculacion_2010-2023.xlsx")
+readr::write_csv2(desvinculados, "datos/mineduc_desvinculacion.csv")
+writexl::write_xlsx(desvinculados, "datos/mineduc_desvinculacion.xlsx")

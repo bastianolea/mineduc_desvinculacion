@@ -1,6 +1,8 @@
 # Tasas de incidencia de desvinculación
 # https://datosabiertos.mineduc.cl/desvinculacion/
 
+# obtener datos desde su fuente en la web
+
 library(rvest)
 library(dplyr)
 library(stringr)
